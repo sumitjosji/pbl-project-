@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1209;
+    --paper: #f5f0e8;
+    --accent: #c8392b;
+    --gold: #b8860b;
+    --muted: #7a6e60;
+    --rule: #d4c9b0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    border-bottom: 3px double var(--rule);
+    padding: 2.5rem 4rem 1.5rem;
+    position: relative;
+    background: linear-gradient(to bottom, #ede8dc, var(--paper));
+  }
+
+  .masthead-rule {
+    width: 100%;
+    height: 1px;
+    background: var(--rule);
+    margin-bottom: 1.2rem;
+  }
+
+  .masthead-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.4rem;
+  }
+
+  .issue-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    text-align: center;
+    margin-bottom: 0.3rem;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 0.8rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  /* ── GRID ── */
+  .library {
+    max-width: 1100px;
+    margin: 3rem auto;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: #fff;
+    border: 1px solid var(--rule);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .card:hover::before { transform: scaleX(1); }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+  }
+
+  .card-badge {
+    padding: 0.6rem 1.2rem;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .card-body { padding: 1.4rem 1.4rem 1.2rem; }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 0.6rem;
+    color: var(--ink);
+  }
+
+  .card-authors {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 0.8rem;
+    font-style: italic;
+  }
+
+  .card-abstract {
+    font-size: 0.82rem;
+    color: #4a4035;
+    line-height: 1.65;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-footer {
+    padding: 0.8rem 1.4rem;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .read-btn {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .read-btn svg {
+    transition: transform 0.2s;
+  }
+  .card:hover .read-btn svg { transform: translateX(4px); }
+
+  .tag {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    color: var(--muted);
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(20,15,8,0.75);
+    z-index: 100;
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .modal-overlay.active { display: flex; }
+
+  .modal {
+    background: var(--paper);
+    max-width: 780px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: rise 0.3s ease;
+    border-top: 5px solid var(--accent);
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .modal-header {
+    padding: 2rem 2.5rem 1.5rem;
+    border-bottom: 1px solid var(--rule);
+    position: sticky;
+    top: 0;
+    background: var(--paper);
+    z-index: 1;
+  }
+
+  .modal-meta {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.6rem;
+  }
+
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 0.4rem;
+  }
+
+  .modal-authors {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.5rem;
+    background: none;
+    border: 1px solid var(--rule);
+    width: 2rem;
+    height: 2rem;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .close-btn:hover { background: var(--ink); color: var(--paper); }
+
+  .modal-body { padding: 2rem 2.5rem 3rem; }
+
+  .modal-section {
+    margin-bottom: 1.8rem;
+  }
+
+  .section-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  .modal-body p {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: #2e2a22;
+    margin-bottom: 0.8rem;
+  }
+
+  .finding-box {
+    background: #fff;
+    border-left: 3px solid var(--accent);
+    padding: 1rem 1.2rem;
+    margin: 1rem 0;
+    font-size: 0.88rem;
+    line-height: 1.7;
+  }
+
+  .finding-box strong {
+    font-family: 'Playfair Display', serif;
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 0.95rem;
+  }
+
+  .tags-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 1.5rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--rule);
+  }
+
+  .tag-chip {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.6rem;
+    background: var(--ink);
+    color: var(--paper);
+    letter-spacing: 0.08em;
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 1.5rem 1.5rem 1rem; }
+    .library { padding: 0 1rem; gap: 1.2rem; }
+    .modal-header, .modal-body { padding: 1.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="masthead-rule"></div>
+  <div class="masthead-top">
+    <span class="issue-label">Research Repository</span>
+    <span class="issue-label">Academic Collection</span>
+  </div>
+  <h1>The Research Library</h1>
+  <p class="subtitle">Select an article to read the full paper</p>
+  <div class="masthead-rule"></div>
+</header>
+
+<div class="library" id="library"></div>
+
+<div class="modal-overlay" id="overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-meta" id="modal-meta"></div>
+      <h2 class="modal-title" id="modal-title"></h2>
+      <p class="modal-authors" id="modal-authors"></p>
+      <button class="close-btn" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const articles = [
+  {
+    id: 1,
+    title: "The Impact of Noise on Learning in Children and Adolescents: A Meta-Analysis",
+    authors: "Gabriela Fretes & Ramon Palau",
+    affiliation: "Universitat Rovira i Virgili, Tarragona, Spain",
+    journal: "Applied Sciences",
+    year: "2025",
+    volume: "Vol. 15, Article 4128",
+    doi: "10.3390/app15084128",
+    tags: ["Meta-Analysis", "Noise Impact", "Cognitive Performance", "Educational Environment"],
+    abstract: "This meta-analysis investigates the effects of environmental and classroom noise on learning, with a focus on cognitive and academic performance in elementary and secondary school students. A systematic review and meta-analysis were conducted on 21 studies comprising 152 effect sizes. The overall effect size was −0.46, indicating a moderate negative impact of noise on performance. The negative effects were particularly significant in children aged 6 to 12.",
+    sections: [
+      {
+        label: "Overview",
+        content: `Noise — defined as any unwanted sound — is regarded as the third most pressing environmental concern after water and air pollution. This meta-analysis synthesizes research from 21 independent studies (152 effect sizes) to understand how noise affects the cognitive and academic performance of school-age children and adolescents. The study used the Restricted Maximum Likelihood (REML) method for statistical estimation.`
+      },
+      {
+        label: "Key Finding",
+        highlight: true,
+        title: "Overall Effect Size: −0.46 (95% CI: −0.54 to −0.38)",
+        content: "This moderate negative effect confirms that as noise levels increase, academic and cognitive performance decreases. The confidence interval does not include zero, confirming the result is statistically significant and not due to chance."
+      },
+      {
+        label: "Impact by Age Group",
+        content: `Children aged 6–12 showed the most significant vulnerability, with a coefficient of −0.350 (p = 0.007). This is likely attributable to still-developing executive functions in younger children, making it harder for them to filter out auditory distractions. Secondary school students were less severely affected.`
+      },
+      {
+        label: "Noise Type Effects",
+        content: `Classroom noise showed a negative trend (−0.161), consistent with expectations that noise within the learning space impairs concentration. Environmental noise affected cognitive flexibility and executive control with effect sizes of 0.54–0.62. Traffic noise showed an unexpected positive estimate (0.477), possibly indicating adaptive compensatory mechanisms in students chronically exposed to background noise — though this result was not statistically significant.`
+      },
+      {
+        label: "Cognitive Domains Examined",
+        content: `The meta-analysis examined: (1) Language comprehension & processing — reading fluency, listening comprehension, writing; (2) Processing speed — response times in reading and attention tasks; (3) Executive control — cognitive flexibility and problem-solving; (4) Attention — selective and sustained; (5) Mathematical skills — arithmetic and reasoning; (6) Academic performance — GPA and standardized scores; (7) Memory — working, verbal, and spatial.`
+      },
+      {
+        label: "Publication Bias & Limitations",
+        content: `Egger's regression test revealed significant asymmetry (Z = −4.764, p < 0.001), suggesting studies reporting significant negative effects may be overrepresented. The I² value of 96.9% indicates high heterogeneity — approximately 97% of variability is due to between-study differences rather than sampling error. The effect size may therefore be slightly overestimated.`
+      },
+      {
+        label: "Conclusion",
+        content: `The findings underscore the importance of minimizing acoustic distractions in educational settings. Noise is a critical, modifiable factor in academic outcomes — especially for younger students. Future research should refine noise exposure assessments and investigate potential moderating variables such as socioeconomic background and language status.`
+      }
+    ]
+  },
+  {
+    id: 2,
+    title: "Noise in Classrooms: Its Impact on Students and How to Cost Effectively Manage It",
+    authors: "Steven Lapp",
+    affiliation: "Cawthra Park Secondary School, Ontario, Canada",
+    journal: "Journal for Activist Science and Technology Education (JASTE)",
+    year: "2019",
+    volume: "Student Reflections",
+    doi: null,
+    tags: ["Classroom Acoustics", "Sound Barriers", "Student Perception", "Action Research"],
+    abstract: "This action research project investigated whether cost-effective baffolds (portable soundproofing walls) could lessen noise levels in open-concept classrooms at Cawthra Park Secondary School. The study also examined how students perceived noise and its effects on attention and learning. Results showed baffolds successfully reduced noise, with an average noise reduction coefficient of 0.880. Notably, students tended to underestimate actual noise levels.",
+    sections: [
+      {
+        label: "Background & Motivation",
+        content: `The author, diagnosed with Central Auditory Processing Disorder (CAPD), experienced firsthand how background noise impairs learning. After being provided an FM system accommodation that significantly improved academic performance, they undertook a Grade 11 STEM project studying classroom noise levels at Cawthra Park Secondary School. Some classrooms registered 80–100 dBA — exceeding Ontario's occupational safety limit of 87 dBA for an 8-hour workday.`
+      },
+      {
+        label: "Key Finding",
+        highlight: true,
+        title: "Average Noise Reduction Coefficient: 0.880",
+        content: "Baffolds (portable soundproofing walls) successfully reduced noise across all tested classroom configurations. In some rooms, noise levels dropped from 80–100 dBA to around 75 dBA — a meaningful reduction that could protect both student learning and teacher health."
+      },
+      {
+        label: "Methodology",
+        content: `The study had two parts. First, portable soundproofing walls (baffolds) were placed on different sides of open-concept classrooms, and decibel readings were taken simultaneously with and without the barrier. Noise reduction coefficients were calculated for each configuration. Second, students completed a survey rating their perceived noise level, learning quality, and ability to concentrate on a 1–10 scale.`
+      },
+      {
+        label: "Baffold Effectiveness (Selected Rooms)",
+        content: `Room 212 (next to room 211): noise dropped from 70–75 dBA to 40–50 dBA (NRC: 0.944). Room 214 (next to room 211): 60–80 dBA → 40–50 dBA (NRC: 0.968). Room 216 (next to room 217): 80–100 dBA → 75 dBA (NRC: 0.943). Room 217 (next to 216): 75 dBA → 50–60 dBA (NRC: 0.822). The overall average NRC was 0.880.`
+      },
+      {
+        label: "Student Perception Findings",
+        content: `A striking finding emerged: most students underestimated the actual noise levels in their classrooms. Those who rated noise as higher were more likely to report reduced ability to pay attention, concentrate, and learn. Conversely, students who rated noise as lower tended to report no learning difficulty — potentially unaware of the harmful acoustic environment they were in. This warrants further investigation.`
+      },
+      {
+        label: "Call to Action",
+        content: `The author argues that school boards and Ministries of Education need to be informed that some classrooms exceed occupational noise limits, and that cost-effective solutions like baffolds are available. Following publication of this research, the noisiest classroom at Cawthra Park Secondary School is now rarely used as a classroom. The author presented findings at the University of Toronto Physics Fair and the Science Education for Civic Action Symposium at OISE.`
+      }
+    ]
+  }
+];
+
+function renderLibrary() {
+  const lib = document.getElementById('library');
+  lib.innerHTML = articles.map(a => `
+    <div class="card" onclick="openModal(${a.id})">
+      <div class="card-badge">
+        <span>${a.journal}</span>
+        <span>${a.year}</span>
+      </div>
+      <div class="card-body">
+        <h2 class="card-title">${a.title}</h2>
+        <p class="card-authors">${a.authors}</p>
+        <p class="card-abstract">${a.abstract}</p>
+      </div>
+      <div class="card-footer">
+        <span class="read-btn">
+          Read Article
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="tag">${a.tags[0]}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openModal(id) {
+  const a = articles.find(x => x.id === id);
+  document.getElementById('modal-meta').textContent = `${a.journal} · ${a.volume} · ${a.year}${a.doi ? ' · DOI: ' + a.doi : ''}`;
+  document.getElementById('modal-title').textContent = a.title;
+  document.getElementById('modal-authors').textContent = `${a.authors} — ${a.affiliation}`;
+
+  const body = document.getElementById('modal-body');
+  body.innerHTML = a.sections.map(s => {
+    if (s.highlight) {
+      return `
+        <div class="modal-section">
+          <div class="section-label">${s.label}</div>
+          <div class="finding-box">
+            <strong>${s.title}</strong>
+            ${s.content}
+          </div>
+        </div>`;
+    }
+    return `
+      <div class="modal-section">
+        <div class="section-label">${s.label}</div>
+        <p>${s.content}</p>
+      </div>`;
+  }).join('') + `
+    <div class="tags-row">
+      ${a.tags.map(t => `<span class="tag-chip">${t}</span>`).join('')}
+    </div>`;
+
+  document.getElementById('overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('overlay')) closeModalDirect();
+}
+
+function closeModalDirect() {
+  document.getElementById('overlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+
+renderLibrary();
+</script>
+</body>
+</html>
